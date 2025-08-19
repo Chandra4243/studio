@@ -1,8 +1,9 @@
 
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useTransition } from "react";
 import { Send, Loader2 } from "lucide-react";
+import { submitContactForm } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,43 +14,34 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function ContactForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    const formData = new FormData(event.currentTarget);
-
-    try {
-      const response = await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formData as any).toString(),
-      });
-
-      if (response.ok) {
+    startTransition(async () => {
+      setError(null);
+      const result = await submitContactForm(formData);
+      
+      if (result.success) {
         toast({
           title: "Message Sent!",
           description: "Thank you for reaching out. I'll get back to you soon.",
         });
-        (event.target as HTMLFormElement).reset();
+        form.reset();
       } else {
-        throw new Error("Form submission failed. Please try again.");
+        setError(result.error || "An unexpected error occurred.");
+        toast({
+          title: "Error",
+          description: result.error || "An unexpected error occurred.",
+          variant: 'destructive'
+        });
       }
-    } catch (e: any) {
-      setError(e.message || "An unexpected error occurred.");
-      toast({
-        title: "Error",
-        description: e.message || "An unexpected error occurred.",
-        variant: 'destructive'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (
@@ -60,7 +52,6 @@ export function ContactForm() {
       <CardContent>
         <form 
           name="contact"
-          method="POST"
           data-netlify="true"
           data-netlify-honeypot="bot-field"
           onSubmit={handleSubmit}
@@ -99,8 +90,8 @@ export function ContactForm() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? (
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Sending...
