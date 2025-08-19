@@ -14,7 +14,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ContactForm } from "@/components/contact-form";
 import { CopyButton } from "@/components/copy-button";
 
 export default function HomePage() {
@@ -47,9 +46,6 @@ export default function HomePage() {
               <div className="mt-10 flex items-center justify-start gap-x-6">
                   <Button asChild size="lg">
                       <Link href="/#projects">View My Work</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                      <Link href="/#contact">Get in Touch</Link>
                   </Button>
               </div>
             </div>
@@ -230,13 +226,11 @@ export default function HomePage() {
                 <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold tracking-tight">Get in Touch</h2>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-                    Have a question or want to work together? Fill out the form below
-                    or reach out via email.
+                    Have a question or want to work together? Reach out via email or phone.
                 </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-12">
-                <div className="space-y-6">
+                <div className="space-y-8 max-w-lg mx-auto">
                     <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
                         <Mail className="h-8 w-8 text-primary" />
@@ -285,10 +279,6 @@ export default function HomePage() {
                         </p>
                     </div>
                     </div>
-                </div>
-                <div>
-                    <ContactForm />
-                </div>
                 </div>
             </div>
         </div>
